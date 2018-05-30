@@ -1,11 +1,12 @@
+#include <stdint.h>
 #include "fixed.h"
 
 fixed f_sqrt(fixed a) {
 	fixed tmp = F_MUL(F_LIT(0.5), a);
 #ifdef CONFIG_FIXED_PRECISE
-	for(uint i = 0; i < 8; i++) {
+	for(uint16_t i = 0; i < 8; i++) {
 #else
-	for(uint i = 0; i < 4; i++) {
+	for(uint16_t i = 0; i < 4; i++) {
 #endif
 		tmp = F_MUL(F_LIT(0.5), F_ADD(tmp, F_DIV(a, tmp)));
 	}
