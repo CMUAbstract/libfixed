@@ -6,8 +6,13 @@
 #define F_K (1 << (F_N - 1))
 #define F_MASK (~(F_ONE | (F_ONE - 1)))
 
-#define F_LIT(f) (fixed)(f * F_ONE)
-#define F_TO_FLOAT(f) (float)(f) / F_ONE 
+#ifdef CONFIG_TEST
+    #define F_LIT(f) (fixed)f
+    #define F_TO_FLOAT(f) (float)f
+#else
+    #define F_LIT(f) (fixed)(f * F_ONE)
+    #define F_TO_FLOAT(f) (float)(f) / F_ONE 
+#endif
 #define F_ADD(a, b) a + b
 #define F_SUB(a, b) a - b
 #define F_MUL(a, b) f_mul(a, b)
@@ -35,13 +40,20 @@ typedef signed int fixed;
 
 // Comment out middle two lines for int arithmetic to work
 static inline fixed f_mul(fixed a, fixed b) {
+#ifdef CONFIG_TEST
+    return a * b;
+#else
     signed int tmp = a * b;
     tmp += F_K;
     tmp >>= F_N;
     return (fixed)tmp;
+#endif
 };
 
 static inline fixed f_div(fixed a, fixed b) {
+#ifdef CONFIG_TEST
+    return a / b;
+#else
     signed long tmp = a << F_N;
     if((tmp >= 0 && b >= 0) || (tmp < 0 && b < 0)) {
     	tmp += b / 2;
@@ -49,6 +61,7 @@ static inline fixed f_div(fixed a, fixed b) {
     	tmp -= b / 2;
     }
     return (fixed)(tmp / b);
+#endif
 }
 
 static inline fixed f_round(fixed a) {
