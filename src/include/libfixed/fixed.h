@@ -8,10 +8,14 @@
 
 #ifdef CONFIG_TEST
     #define F_LIT(f) (fixed)f
-    #define F_TO_FLOAT(f) (float)f
+    #ifndef CONFIG_RISCV
+        #define F_TO_FLOAT(f) (float)f
+    #endif
 #else
     #define F_LIT(f) (fixed)(f * F_ONE)
-    #define F_TO_FLOAT(f) (float)(f) / F_ONE 
+    #ifndef CONFIG_RISCV
+        #define F_TO_FLOAT(f) (float)(f) / F_ONE 
+    #endif
 #endif
 #define F_ADD(a, b) a + b
 #define F_SUB(a, b) a - b
