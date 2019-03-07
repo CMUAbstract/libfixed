@@ -1,6 +1,8 @@
 #ifndef FIXED_H
 #define FIXED_H
 
+#include <stdint.h>
+
 #define F_N CONFIG_FRAC_BITWIDTH
 #define F_ONE (1 << F_N)
 #define F_K (1 << (F_N - 1))
@@ -37,9 +39,9 @@
 #define F_HALF_PI F_LIT(1.5707963)
 
 #if CONFIG_BITWIDTH == 8
-typedef signed char fixed;
+typedef int8_t fixed;
 #else
-typedef signed int fixed;
+typedef int16_t fixed;
 #endif
 
 // Comment out middle two lines for int arithmetic to work
