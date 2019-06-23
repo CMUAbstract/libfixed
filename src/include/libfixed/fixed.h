@@ -40,8 +40,13 @@
 
 #if CONFIG_BITWIDTH == 8
 typedef int8_t fixed;
-#else
+typedef int16_t fixed2;
+#elif CONFIG_BITWIDTH == 16
 typedef int16_t fixed;
+typedef int32_t fixed2;
+#else
+typedef int32_t fixed;
+typedef int64_t fixed2;
 #endif
 
 // Comment out middle two lines for int arithmetic to work
@@ -49,7 +54,7 @@ static inline fixed f_mul(fixed a, fixed b) {
 #ifdef CONFIG_TEST
     return a * b;
 #else
-    signed int tmp = a * b;
+    fixed2 tmp = (fixed2)a * (fixed2)b;
     tmp += F_K;
     tmp >>= F_N;
     return (fixed)tmp;
