@@ -2,8 +2,12 @@
 #define FIXED_H
 
 #include <stdint.h>
+#include <limits.h>
 
 #define F_N CONFIG_FRAC_BITWIDTH
+#define F_I ( CONFIG_BITWIDTH - F_N )
+#define F_IMAX ( F_MAX >> F_N )
+#define F_IMIN ( F_MIN >> F_N )
 #define F_ONE (1 << F_N)
 #define F_K (1 << (F_N - 1))
 #define F_MASK (~(F_ONE | (F_ONE - 1)))
@@ -19,7 +23,7 @@
         #define F_TO_FLOAT(f) (float)(f) / F_ONE 
     #endif
 #endif
-#define F_ADD(a, b) a + b
+#define F_ADD(a, b) f_add(a, b)
 #define F_SUB(a, b) a - b
 #define F_MUL(a, b) f_mul(a, b)
 #define F_DIV(a, b) f_div(a, b)
@@ -41,13 +45,36 @@
 #if CONFIG_BITWIDTH == 8
 typedef int8_t fixed;
 typedef int16_t fixed2;
+#define F_MAX CHAR_MAX
+#define F_MIN CHAR_MIN
 #elif CONFIG_BITWIDTH == 16
 typedef int16_t fixed;
 typedef int32_t fixed2;
+#define F_MAX SHRT_MAX
+#define F_MIN SHRT_MIN
 #else
 typedef int32_t fixed;
 typedef int64_t fixed2;
+#define F_MAX INT_MAX
+#define F_MIN INT_MIN
 #endif
+
+static inline fixed f_add(fixed a, fixed b){
+	if( a > 0 && b > 0 ){ // High side overflow
+		if( (a >> F_N) <= ( F_IMAX - (b >> F_N) ) )
+			return a+b;
+		else
+			return (fixed) F_MAX;
+		}
+	else if ( a < 0 && b < 0 ){ // Low side overflow
+		if( (a >> F_N) >= ( F_IMIN - (b >> F_N) ) )
+			return a+b;
+		else
+			return (fixed) F_MIN;
+		}
+	
+	return a+b;
+	}
 
 // Comment out middle two lines for int arithmetic to work
 static inline fixed f_mul(fixed a, fixed b) {
