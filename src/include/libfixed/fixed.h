@@ -55,8 +55,8 @@ typedef int32_t fixed2;
 #else
 typedef int32_t fixed;
 typedef int64_t fixed2;
-#define F_MAX INT_MAX
-#define F_MIN INT_MIN
+#define F_MAX LONG_MAX
+#define F_MIN LONG_MIN
 #endif
 
 static inline fixed f_add(fixed a, fixed b){
