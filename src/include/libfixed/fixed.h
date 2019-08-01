@@ -92,7 +92,7 @@ static inline fixed f_div(fixed a, fixed b) {
 #ifdef CONFIG_TEST
     return a / b;
 #else
-    signed long tmp = a << F_N;
+    fixed2 tmp = (fixed2)a << F_N;
     if((tmp >= 0 && b >= 0) || (tmp < 0 && b < 0)) {
     	tmp += b / 2;
     } else {
