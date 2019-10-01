@@ -12,17 +12,19 @@
 #define F_K (1 << (F_N - 1))
 #define F_MASK (~(F_ONE | (F_ONE - 1)))
 
-#ifdef CONFIG_TEST
-    #define F_LIT(f) (fixed)f
-    #ifndef CONFIG_RISCV
-        #define F_TO_FLOAT(f) (float)f
-    #endif
-#else
-    #define F_LIT(f) (fixed)(f * F_ONE)
-    #ifndef CONFIG_RISCV
-        #define F_TO_FLOAT(f) (float)(f) / F_ONE 
-    #endif
-#endif
+#define F_LIT(f) (fixed)(f * F_ONE)
+#define F_TO_FLOAT(f) (float)(f) / F_ONE 
+//#ifdef CONFIG_TEST
+//    #define F_LIT(f) (fixed)f
+//    #ifndef CONFIG_RISCV
+//        #define F_TO_FLOAT(f) (float)f
+//    #endif
+//#else
+//    #define F_LIT(f) (fixed)(f * F_ONE)
+//    #ifndef CONFIG_RISCV
+//        #define F_TO_FLOAT(f) (float)(f) / F_ONE 
+//    #endif
+//#endif
 #define F_ADD(a, b) f_add(a, b)
 #define F_SUB(a, b) a - b
 #define F_MUL(a, b) f_mul(a, b)

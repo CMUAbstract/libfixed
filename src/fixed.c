@@ -3,7 +3,7 @@
 
 fixed f_sqrt(fixed a) {
 	fixed tmp = F_MUL(F_LIT(0.5), a);
-#ifdef CONFIG_FIXED_PRECISE
+#ifdef CONFIG_PRECISE
 	for(uint16_t i = 0; i < 8; i++) {
 #else
 	for(uint16_t i = 0; i < 4; i++) {
@@ -42,7 +42,7 @@ fixed f_cos(fixed a) {
 	fixed second_term = F_MUL(F_MUL(F_LIT(0.405284735), tmp), tmp);
 	if(F_LT(tmp, F_LIT(0))){
 	    tmp = first_term + second_term;
-#ifdef CONFIG_FIXED_PRECISE
+#ifdef CONFIG_PRECISE
 	    if(F_LT(tmp, F_LIT(0))) {
 	    	return F_ADD(F_MUL(F_LIT(0.225), F_ADD(F_MUL(tmp, -tmp), -tmp)), tmp);
 	    }
@@ -52,7 +52,7 @@ fixed f_cos(fixed a) {
 #endif
 	}
 	tmp = first_term - second_term;
-#ifdef CONFIG_FIXED_PRECISE
+#ifdef CONFIG_PRECISE
 	if(F_LT(tmp, F_LIT(0))) {
     	return F_ADD(F_MUL(F_LIT(0.225), F_ADD(F_MUL(tmp, -tmp), -tmp)), tmp);
     }
@@ -85,7 +85,7 @@ fixed f_sin(fixed a) {
 	fixed second_term = F_MUL(F_MUL(F_LIT(0.405284735), tmp), tmp);
 	if(F_LT(tmp, F_LIT(0))){
 	    tmp = first_term + second_term;
-#ifdef CONFIG_FIXED_PRECISE
+#ifdef CONFIG_PRECISE
 	    if(F_LT(tmp, F_LIT(0))) {
 	    	return F_ADD(F_MUL(F_LIT(0.225), F_ADD(F_MUL(tmp, -tmp), -tmp)), tmp);
 	    }
@@ -95,7 +95,7 @@ fixed f_sin(fixed a) {
 #endif
 	}
 	tmp = first_term - second_term;
-#ifdef CONFIG_FIXED_PRECISE
+#ifdef CONFIG_PRECISE
 	if(F_LT(tmp, F_LIT(0))) {
     	return F_ADD(F_MUL(F_LIT(0.225), F_ADD(F_MUL(tmp, -tmp), -tmp)), tmp);
     }
