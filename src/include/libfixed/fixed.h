@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <limits.h>
 
+#define CONFIG_BITWIDTH 16
+#define CONFIG_FRAC_BITWIDTH 5
+
 #define F_N CONFIG_FRAC_BITWIDTH
 #define F_I ( CONFIG_BITWIDTH - F_N )
 #define F_IMAX ( F_MAX >> F_N )
