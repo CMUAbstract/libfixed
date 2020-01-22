@@ -33,6 +33,7 @@
 #define F_GTE(a, b) a >= b
 #define F_EQ(a, b) a == b
 #define F_NEQ(a, b) a != b
+#define F_MAX  f_max
 
 #define F_PI F_LIT(3.1415926)
 #define F_TWO_PI F_LIT(6.2831853)
@@ -40,7 +41,9 @@
 
 #if CONFIG_BITWIDTH == 8
 typedef int8_t fixed;
+#define f_max 127
 #else
+#define f_max 32767
 typedef int16_t fixed;
 #endif
 
@@ -49,9 +52,37 @@ static inline fixed f_mul(fixed a, fixed b) {
 #ifdef CONFIG_TEST
     return a * b;
 #else
-    signed int tmp = a * b;
+		uint8_t test = (a >0 && b>0);
+		uint8_t test1 = (a < 0 && b < 0);
+		uint8_t test2 = ((a < 0 && b > 0) || ( a > 0 && b < 0));
+    //signed int tmp = a * b;
+    //signed int tmp = (signed int)a * (signed int) b;
+    signed long tmp = (signed long)a * (signed long)b;
+		// Check for double overflow...
+		if (tmp >> F_N > 65535) {
+			printf("Double overflow incoming!\r\n");
+			tmp = 1048576;
+		}
+		if (tmp >> F_N < -65535) {
+			printf("Double overflow mixed signs\r\n");
+			tmp = -1048576;
+		}
+		//printf("prod: %d, a=%i b=%i, sizeof=%i\r\n",tmp,a,b,sizeof(signed int));
     tmp += F_K;
     tmp >>= F_N;
+		//printf("after shift: %d, fixed: %i\r\n",tmp, (fixed)tmp);
+		if (test && (fixed)tmp < 0) {
+			tmp = F_MAX;
+			printf("Error! multiplication overflow %i * %i, new out=%i\r\n",a,b,tmp);
+		}
+		if (test1 && (fixed)tmp < 0) {
+			tmp = F_MAX;
+			printf("Error! multiplication overflow for negatives: %i * %i, new out=%i\r\n",a,b,tmp);
+		}
+		if (test2 && (fixed)tmp > 0) {
+			tmp = -1 *F_MAX;
+			printf("Error! Overflow with one pos and one neg: %i * %i, new out = %i\r\n",a,b,tmp);
+		}
     return (fixed)tmp;
 #endif
 };
