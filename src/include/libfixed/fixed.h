@@ -34,6 +34,7 @@
 #define F_EQ(a, b) a == b
 #define F_NEQ(a, b) a != b
 #define F_MAX  f_max
+#define F_SIGN_MASK sign_mask
 
 #define F_PI F_LIT(3.1415926)
 #define F_TWO_PI F_LIT(6.2831853)
@@ -42,47 +43,55 @@
 #if CONFIG_BITWIDTH == 8
 typedef int8_t fixed;
 #define f_max 127
+#define sign_mask 0x80
 #else
 #define f_max 32767
+#define sign_mask 0x8000
 typedef int16_t fixed;
 #endif
 
+#define USE_LONG 1
 // Comment out middle two lines for int arithmetic to work
 static inline fixed f_mul(fixed a, fixed b) {
 #ifdef CONFIG_TEST
     return a * b;
 #else
-		uint8_t test = (a >0 && b>0);
-		uint8_t test1 = (a < 0 && b < 0);
-		uint8_t test2 = ((a < 0 && b > 0) || ( a > 0 && b < 0));
-    //signed int tmp = a * b;
+		uint8_t test = (((a & F_SIGN_MASK) > 0) == ((b & F_SIGN_MASK) > 0));
+		//printf("Test is :%i, a: %i, b:%i, %i, %i\r\n",test,a,b,a & F_SIGN_MASK, b &
+		//F_SIGN_MASK);
     //signed int tmp = (signed int)a * (signed int) b;
+#if USE_LONG
     signed long tmp = (signed long)a * (signed long)b;
 		// Check for double overflow...
 		if (tmp >> F_N > 65535) {
-			printf("Double overflow incoming!\r\n");
-			tmp = 1048576;
+			//printf("Double overflow incoming!\r\n");
+			//tmp = 1048576;
+			// Just go straight to the ceiling
+			tmp = F_MAX;
 		}
 		if (tmp >> F_N < -65535) {
-			printf("Double overflow mixed signs\r\n");
-			tmp = -1048576;
+			//printf("Double overflow mixed signs\r\n");
+			//tmp = -1048576;
+			tmp = -1 * F_MAX;
 		}
+#else
+    signed int tmp = a * b;
+#endif
 		//printf("prod: %d, a=%i b=%i, sizeof=%i\r\n",tmp,a,b,sizeof(signed int));
     tmp += F_K;
     tmp >>= F_N;
 		//printf("after shift: %d, fixed: %i\r\n",tmp, (fixed)tmp);
+#if USE_LONG
+		// Works for both + * + and - * -
 		if (test && (fixed)tmp < 0) {
 			tmp = F_MAX;
-			printf("Error! multiplication overflow %i * %i, new out=%i\r\n",a,b,tmp);
+			//printf("Error! multiplication overflow %i * %i, new out=%i\r\n",a,b,tmp);
 		}
-		if (test1 && (fixed)tmp < 0) {
-			tmp = F_MAX;
-			printf("Error! multiplication overflow for negatives: %i * %i, new out=%i\r\n",a,b,tmp);
-		}
-		if (test2 && (fixed)tmp > 0) {
+		if (!test && (fixed)tmp > 0) {
 			tmp = -1 *F_MAX;
-			printf("Error! Overflow with one pos and one neg: %i * %i, new out = %i\r\n",a,b,tmp);
+			//printf("Error! Overflow with one pos and one neg: %i * %i, new out = %i\r\n",a,b,tmp);
 		}
+#endif
     return (fixed)tmp;
 #endif
 };
