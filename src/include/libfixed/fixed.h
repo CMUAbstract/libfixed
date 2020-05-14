@@ -4,6 +4,23 @@
 #include <stdint.h>
 #include <limits.h>
 
+#if CONFIG_BITWIDTH == 8
+typedef int8_t fixed;
+typedef int16_t fixed2;
+#define F_MAX CHAR_MAX
+#define F_MIN CHAR_MIN
+#elif CONFIG_BITWIDTH == 16
+typedef int16_t fixed;
+typedef int32_t fixed2;
+#define F_MAX SHRT_MAX
+#define F_MIN SHRT_MIN
+#else
+typedef int32_t fixed;
+typedef int64_t fixed2;
+#define F_MAX LONG_MAX
+#define F_MIN LONG_MIN
+#endif
+
 #define F_N CONFIG_FRAC_BITWIDTH
 #define F_I ( CONFIG_BITWIDTH - F_N )
 #define F_IMAX ( F_MAX >> F_N )
@@ -42,22 +59,6 @@
 #define F_TWO_PI F_LIT(6.2831853)
 #define F_HALF_PI F_LIT(1.5707963)
 
-#if CONFIG_BITWIDTH == 8
-typedef int8_t fixed;
-typedef int16_t fixed2;
-#define F_MAX CHAR_MAX
-#define F_MIN CHAR_MIN
-#elif CONFIG_BITWIDTH == 16
-typedef int16_t fixed;
-typedef int32_t fixed2;
-#define F_MAX SHRT_MAX
-#define F_MIN SHRT_MIN
-#else
-typedef int32_t fixed;
-typedef int64_t fixed2;
-#define F_MAX LONG_MAX
-#define F_MIN LONG_MIN
-#endif
 
 static inline fixed f_add(fixed a, fixed b){
 	if( a > 0 && b > 0 ){ // High side overflow
