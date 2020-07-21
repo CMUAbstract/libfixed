@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "fixed.h"
+#include <libfixed/fixed.h>
 
 fixed f_sqrt(fixed a) {
 	fixed tmp = F_MUL(F_LIT(0.5), a);
